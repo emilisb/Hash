@@ -10,28 +10,33 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include "timer/Timer.h"
+#include "Timer/Timer.h"
 #include "Hash.h"
 
+#define __PROFILE__ false
+
+void printUsage() {
+    std::cout <<
+    "Bad usage!" << std::endl << std::endl <<
+    "Usage with string:" << std::endl <<
+    "<program> <value>" << std::endl << std::endl <<
+    "Usage with file:" << std::endl <<
+    "<program> file <filename>" << std::endl;
+}
+
 int main(int argc, const char * argv[]) {
-    if (argc != 3) {
-        std::cout <<
-        "Bad usage!" << std::endl << std::endl <<
-        "Usage with string:" << std::endl <<
-        "<program> string <value>" << std::endl << std::endl <<
-        "Usage with file:" << std::endl <<
-        "<program> file <filename>" << std::endl;
+    if (argc == 1) {
+        printUsage();
         return 0;
     }
     
     const std::vector<std::string> allArgs(argv, argv + argc);
-    const std::string type = allArgs.at(1);
     
     std::string input;
     
-    if (type == "string") {
-        input = allArgs.at(2);
-    } else if (type == "file") {
+    if (argc == 2) {
+        input = allArgs.at(1);
+    } else if (allArgs.at(1) == "file") {
         std::ifstream infile { allArgs.at(2) };
         input = { std::istreambuf_iterator<char>(infile), std::istreambuf_iterator<char>() };
         
@@ -40,17 +45,21 @@ int main(int argc, const char * argv[]) {
             return 0;
         }
     } else {
-        std::cout << "Unknown argument!" << std::endl;
+        printUsage();
         return 0;
     }
     
+#if __PROFILE__
     Timer t;
     t.start();
-
-    Hash hasher;
-    std::cout << "Result: " << hasher.getHash(input) << std::endl;
+#endif
     
+    Hash hasher;
+    std::cout << hasher.getHash(input) << std::endl;
+    
+#if __PROFILE__
     std::cout << "Took: " << t.duration() << " us" << std::endl;
+#endif
     
     return 0;
 }
