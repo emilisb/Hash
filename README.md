@@ -8,7 +8,7 @@
  - `https://github.com/emilisb/Hash.git`
  - `cd Hash`
  - `make`
- - `./bin/uzduotis <arg1> <arg>`
+ - `./bin/uzduotis <arg1> <arg2>`
  
  ## Usage
  - Benchmark test: `<program> benchmark <filename>`
@@ -17,9 +17,9 @@
  
  ## Results
  1. Hash length is always the same, e.g.:
- - Lietuva - `33oip9edxwvnxvo0j2zqfe3r209sffl9`
- - LietuvaTevyneMusu - `v8i2o6a66apy6glhgqag78b9a7f1mwb5`
- 2. Hashing time of konstitucija.txt - 0.003842s
+ - Lietuva - `33oip9edxwvnxvo0j2zqfe3r209sffl9` - 32 characters
+ - LietuvaTevyneMusu - `v8i2o6a66apy6glhgqag78b9a7f1mwb5` - 32 characters
+ 2. Hashing time of konstitucija.txt - `0.003842s`
  3. Time comparison with SHA256:
  ```
  Starting comparison with SHA256 with 100000 strings of 14 characters
