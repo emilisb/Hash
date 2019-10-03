@@ -53,5 +53,19 @@
  Word similarity average: 0.0108
  Found 0 collision(s)
  ```
+ 
+ ## Test file results
+ 
+ ### Files with 1 character
+ - char1.txt - `lf0zkg6xni9sxi6akggzq2h3ea137hie`
+ - char2.txt - `k3tfwczic6zz2e69qv17xcd8f01ftwvv`
+ 
+ ### Files with same string, but one different character
+ - similar1.txt - `tpc7sl00i7s8qb5kubprwsn265z12r0t`
+ - similar2.txt - `sbs8qhsapfqrey6csvlocr7gxd1eueeq`
+ 
+ ### Long text files
+ - text1.txt - `5c1feqdt9q25vn4ycdaonmn905cozme2`
+ - text2.txt - `5bu2pbhiw9tq5rpwhm63wu87916p8qhl`
 
 [version-badge]: https://img.shields.io/badge/version-0.1-green.svg
