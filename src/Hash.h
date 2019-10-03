@@ -15,49 +15,38 @@
 #include <algorithm>
 #include <cmath>
 
-#define CHARACTER_TABLE_SIZE 62
+#define CHARACTER_TABLE_SIZE 36
 const char CHARACTER_TABLE[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 };
 
 class Hash {
 public:
     Hash(std::string seed = BASE_KEY) {
-        numericSeed = textToAscii(seed);
+        baseKey = seed;
     }
     
     std::string getHash(std::string inputText) {
-#if __PROFILE__
-        std::cout << "Input text: " << inputText << std::endl;
-#endif
-        std::string result = numericSeed;
-        const std::string numericInput = textToAscii(inputText);
-#if __PROFILE__
-        std::cout << "Ascii value: " << numericInput << std::endl;
-#endif
+        char *result = new char[baseKey.length()];
+        strcpy(result, baseKey.c_str());
         
-        const size_t inputLength = numericInput.length();
+        const size_t inputLength = inputText.length();
         
         size_t offset = 0;
-        size_t size = std::min(numericSeed.length(), inputLength);
+        size_t size = std::min(baseKey.length(), inputLength);
         
         do {
-            result = hashBlock(result, numericInput.substr(offset, std::min(size, inputLength - offset)));
+            const std::string newBlock = inputText.substr(offset, std::min(size, inputLength - offset));
+            result = hashBlock(result, newBlock.c_str(), newBlock.length());
             offset += size;
         } while (offset < inputLength);
 
-        std::string reverseHash = result;
-        std::reverse(reverseHash.begin(), reverseHash.end());
-        
-        result = hashBlock(reverseHash, result);
-        
-        return numericToText(result);
+        return numericToText(result, baseKey.length());
     }
     
 private:
-    std::string numericSeed;
+    std::string baseKey;
     
     inline unsigned int getStringSum(const char *text, size_t length) {
         unsigned int sum = 0;
@@ -68,52 +57,36 @@ private:
         return sum;
     }
     
-    inline std::string hashBlock(std::string base, std::string block) {
+    inline char *hashBlock(char *base, const char *block, size_t blockSize) {
 #if __PROFILE__
         std::cout << "Hashing " << base << " with " << block << std::endl;
 #endif
-        std::string longerString = base.length() > block.length() ? base : block;
-        const std::string shorterString = longerString == base ? block : base;
+        const unsigned int baseSum = getStringSum(base, baseKey.length());
+        const unsigned int blockSum = getStringSum(block, blockSize);
         
-        const unsigned int baseSum = getStringSum(base.c_str(), base.length());
-        const unsigned int blockSum = getStringSum(block.c_str(), block.length());
-        
-        const auto longerStringLength = longerString.length();
-        const auto shorterStringLength = shorterString.length();
-        
+        char *result = base;
         unsigned int blockDigit = 0;
-        for (int i = 0; i < longerStringLength; i++) {
-            const unsigned int extraLonger = i > 0 ? longerString[i - 1] : longerString[1];
-            const unsigned int extraShorter = blockDigit > 0 ? shorterString[blockDigit - 1] : shorterString[1];
+        for (int i = 0; i < baseKey.length(); i++) {
+            const unsigned int extraLonger = i > 0 ? base[i - 1] : base[1];
+            const unsigned int extraShorter = blockDigit > 0 ? block[blockDigit - 1] : block[1];
             
-            const std::string key = std::to_string(std::tan(longerString[i] * (shorterString[blockDigit] + 87) + extraLonger + extraShorter) * (101 + extraLonger * extraShorter + baseSum - blockSum));
+            const int key = std::tan(base[i] * (block[blockDigit] + 87) + extraLonger + extraShorter) * (101 + extraLonger * extraShorter + baseSum - blockSum) + i;
             
-            longerString[i] = key.back();
-            if (blockDigit + 1 < shorterStringLength) {
+            result[i] = std::abs(key) % CHAR_MAX;
+            if (blockDigit + 1 < blockSize) {
                 blockDigit++;
             } else {
                 blockDigit = 0;
             }
         }
         
-        return longerString;
-    }
-    
-    inline std::string textToAscii(std::string text) {
-        std::string result;
-        for (const auto &character : text) {
-            result += std::to_string(character);
-        }
-        
         return result;
     }
     
-    inline std::string numericToText(std::string numericValue) {
+    inline std::string numericToText(char *numericValue, size_t length) {
         std::string result;
-        const auto numericValueLength = numericValue.length();
-        for (size_t i = 0; i < numericValueLength / 2; i++) {
-            unsigned int index = stoi(numericValue.substr(i, 2)) % CHARACTER_TABLE_SIZE;
-            result += CHARACTER_TABLE[index];
+        for (size_t i = 0; i < length; i++) {
+            result += CHARACTER_TABLE[numericValue[i] % CHARACTER_TABLE_SIZE];
         }
         
         return result;
