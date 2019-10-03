@@ -12,12 +12,15 @@
 #include <string>
 #include "Timer/Timer.h"
 #include "Hash.h"
+#include "Tester.h"
 
 #define __PROFILE__ false
 
 void printUsage() {
     std::cout <<
     "Bad usage!" << std::endl << std::endl <<
+    "Benchmark test:" << std::endl <<
+    "<program> benchmark <filename>" << std::endl << std::endl <<
     "Usage with string:" << std::endl <<
     "<program> <value>" << std::endl << std::endl <<
     "Usage with file:" << std::endl <<
@@ -34,7 +37,11 @@ int main(int argc, const char * argv[]) {
     
     std::string input;
     
-    if (argc == 2) {
+    if (argc == 3 && allArgs.at(1) == "benchmark") {
+        Tester tester;
+        tester.benchmark(allArgs.at(2));
+        return 0;
+    } else if (argc == 2) {
         input = allArgs.at(1);
     } else if (allArgs.at(1) == "file") {
         std::ifstream infile { allArgs.at(2) };
